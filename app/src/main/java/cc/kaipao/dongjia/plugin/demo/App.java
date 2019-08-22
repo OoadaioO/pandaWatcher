@@ -20,12 +20,12 @@ public class App extends Application {
         Watcher.setWatchListener(new WatchListener() {
             @Override
             public void onShowPage(@NonNull String pageName, @NonNull String randomId, @NonNull String lastPageName) {
-                Log.d(TAG, "onShowPage() called with: pageName = [" + pageName + "], randomId = [" + randomId + "], lastPageName = [" + lastPageName + "]");
+                Log.d(TAG, "app#onShowPage() called with: pageName = [" + pageName + "], randomId = [" + randomId + "], lastPageName = [" + lastPageName + "]");
             }
 
             @Override
             public void onHidePage(@NonNull String pageName, @NonNull String randomId, @NonNull String lastPageName) {
-                Log.d(TAG, "onHidePage() called with: pageName = [" + pageName + "], randomId = [" + randomId + "], lastPageName = [" + lastPageName + "]");
+                Log.d(TAG, "app#onHidePage() called with: pageName = [" + pageName + "], randomId = [" + randomId + "], lastPageName = [" + lastPageName + "]");
 
             }
         });

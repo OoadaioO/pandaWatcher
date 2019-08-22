@@ -9,11 +9,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import cc.kaipao.dongjia.plugin.panda.annotation.WatchIgnore;
+import cc.kaipao.dongjia.plugin.panda.annotation.WatchPageTitle;
+import cc.kaipao.dongjia.plugin.panda.annotation.WatchPagerFragment;
 
 /**
  *
  */
-public class PagerFragment extends Fragment {
+@WatchPagerFragment
+@WatchPageTitle
+public class TestPagerFragment extends Fragment {
 
     private TextView text;
     private String content;

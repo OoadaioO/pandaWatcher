@@ -3,11 +3,11 @@ package cc.kaipao.dongjia.plugin
 import com.android.build.api.transform.*
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.internal.pipeline.TransformManager
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.compress.utils.IOUtils
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.internal.impldep.org.apache.commons.codec.digest.DigestUtils
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
@@ -69,10 +69,14 @@ public class WatcherTransform extends Transform implements Plugin<Project> {
             // 文件类型input遍历
             input.directoryInputs.each { DirectoryInput directoryInput ->
 
-                HashMap<String, File> modifyMap = new HashMap<>()
 
                 File dir = directoryInput.file;
                 if (dir.isDirectory()) {
+
+                    println "watcher#start java scan:" + directoryInput.file.absolutePath
+
+
+                    HashMap<String, File> modifyMap = new HashMap<>()
 
                     // 循环遍历文件
                     dir.eachFileRecurse { File file ->
@@ -81,20 +85,22 @@ public class WatcherTransform extends Transform implements Plugin<Project> {
                             modifyMap.put(file.absolutePath.replace(dir.absolutePath, ""), modifiedFile)
                         }
                     }
-                }
 
-                def dest = transformInvocation.outputProvider.getContentLocation(directoryInput.name, directoryInput.contentTypes,
-                        directoryInput.scopes, Format.DIRECTORY)
-                FileUtils.copyFile(dir, dest)
+                    def dest = transformInvocation.outputProvider.getContentLocation(directoryInput.name, directoryInput.contentTypes,
+                            directoryInput.scopes, Format.DIRECTORY)
 
-                modifyMap.entrySet().each { Map.Entry<String, File> entry ->
-                    File target = new File(dest.absolutePath + entry.getKey())
-                    if (target.exists()) {
-                        target.delete()
+                    FileUtils.copyDirectory(dir, dest)
+
+                    modifyMap.entrySet().each { Map.Entry<String, File> entry ->
+                        File target = new File(dest.absolutePath + entry.getKey())
+                        if (target.exists()) {
+                            target.delete()
+                        }
+                        println "watcher#replace:" + target.absolutePath
+                        FileUtils.copyFile(entry.getValue(), target)
+                        entry.getValue().delete()
                     }
-                    println "watcher#replace:"+target.absolutePath
-                    FileUtils.copyFile(entry.getValue(), target)
-                    entry.getValue().delete()
+                    println "watcher#end java scan:" + directoryInput.file.absolutePath
                 }
 
             }
@@ -102,8 +108,10 @@ public class WatcherTransform extends Transform implements Plugin<Project> {
             // jar类型input遍历
             input.jarInputs.each { JarInput jarInput ->
 
-                // 重命名，避免输出jar包重名
                 def jarName = jarInput.name
+                println "watcher#start jar scan:" + jarName
+
+                // 重命名，避免输出jar包重名
                 def md5Name = DigestUtils.md5Hex(jarInput.file.getAbsolutePath())
                 if (jarName.endsWith(".jar")) {
                     jarName = jarName.substring(0, jarName.length() - 4)
@@ -129,7 +137,7 @@ public class WatcherTransform extends Transform implements Plugin<Project> {
                     jarOutputStream.putNextEntry(zipEntry)
                     if (isTargetClass(entryName)) {
                         println "watcher#modify jar entry:" + entryName
-                        byte[] modifyCodeBytes = modifyClass(array)
+                        byte[] modifyCodeBytes = modifyClass(originalBytes)
                         jarOutputStream.write(modifyCodeBytes)
                     } else {
                         jarOutputStream.write(originalBytes)
@@ -148,6 +156,7 @@ public class WatcherTransform extends Transform implements Plugin<Project> {
                         Format.JAR)
                 FileUtils.copyFile(tmpFile, dest)
                 tmpFile.delete()
+                println "watcher#end jar scan:" + jarName
             }
         }
     }

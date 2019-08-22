@@ -1,6 +1,5 @@
 package cc.kaipao.dongjia.plugin.demo;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import com.google.android.material.tabs.TabLayout;
@@ -14,11 +13,13 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import cc.kaipao.dongjia.plugin.panda.annotation.WatchIgnore;
 
 /**
  *
  */
-public class PagerActivity extends FragmentActivity {
+@WatchIgnore
+public class TestPagerActivity extends FragmentActivity {
 
     private ViewPager pager;
 
@@ -32,7 +33,7 @@ public class PagerActivity extends FragmentActivity {
         List<Fragment> fragments = new ArrayList<>();
         List<String> titles = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            PagerFragment fragment = new PagerFragment();
+            TestPagerFragment fragment = new TestPagerFragment();
             String content = "page " + i;
             titles.add(content);
             fragment.setContent(content);
