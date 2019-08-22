@@ -1,0 +1,25 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+    implementation 'org.javassist:javassist:3.25.0-GA'
+    implementation 'com.android.tools.build:gradle:3.4.2'
+}
+
+repositories {
+    mavenCentral()
+}
+
+group = "cc.kaipao.dongjia"
+version = "1.0.0"
+
+uploadArchives{
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+        }
+    }
+}
